@@ -2,75 +2,69 @@ console.log("Olá, viemos em paz!");
 
 const http = require('http');
 
+const server = http.createServer((req, res) => {
 
-
-const server = http.createServer(( req, res) => {
-
-    //Principal
+    // Principal
     if (req.url === '/') {
-        res.statusCode = 200; //Indica sucesso na resposta
-        res.setHeader('Content-type', 'text/plain; charset=utf-8'); //Define o formato da resposta
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.end('Olá, página principal!');
     }
 
-
-    //Status
+    // Status
     else if (req.url === '/status') {
-             res.statusCode = 200; //Indica sucesso na resposta
-             res.setHeader('Content-type', 'text-html; charset=utf-8');
-             const Principal = `
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
-             <!DOCTYPE html>
-            <html lang="pt-br">
-            <head>
+        const Principal = `
+        <!DOCTYPE html>
+        <html lang="pt-br">
+        <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Document</title>
-</head>
-<body>
-            <h1>Bem vindo à página principal!</h1>
-    <p>Aqui você pode fazer :
-        1. Nada
-        2. Nada
-        3. Nada
-        4. Nada
-        5. Nada
-        Espero que aproveite nosso site!
-    </p>
-</body>
-</html>
-
+            <title>Status</title>
+        </head>
+        <body>
+            <h1>Bem-vindo à página principal!</h1>
+            <p>
+                Aqui você pode fazer:
+                <br>1. Nada
+                <br>2. Nada
+                <br>3. Nada
+                <br>4. Nada
+                <br>5. Nada
+            </p>
+        </body>
+        </html>
         `;
 
         res.end(Principal);
     }
 
-
-    //Erro
+    // Erro 404
     else {
         res.statusCode = 404;
-        res.setHeader('Content-Type', 'text-html; charset=utf-8');
-        const errorPage = `
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
+        const errorPage = `
         <!DOCTYPE html>
-            <html lang="pt-br">
+        <html lang="pt-br">
         <head>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Erro 404</title>
         </head>
-            <body>
-        <h1>Erro 404 - Página não encontrada</h1>
-        <p>A página que tentou acessar não foi encontrada, tente novamente mais tarde</p>
-        <a href="/status">Voltar para a página principal</a>
-            </body>
+        <body>
+            <h1>Erro 404 - Página não encontrada</h1>
+            <p>A página que tentou acessar não foi encontrada.</p>
+            <a href="/status">Voltar para a página principal</a>
+        </body>
         </html>
-
         `;
 
         res.end(errorPage);
     }
+});
 
 server.listen(3000, () => {
-  console.log("Servidor rodando na porta 3000");
-})});
+    console.log("Servidor rodando na porta 3000");
+});
