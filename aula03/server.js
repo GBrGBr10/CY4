@@ -75,8 +75,68 @@ function adicionarFilme(novoFilme) {
         return;
     }
 
-        movies.push(novoFilme);
-    console.log(`Fukne ${novoFilme.title} adiocionado com sucesso!`)
+    movies.push(novoFilme);
+    console.log(`Filme ${novoFilme.title} adiocionado com sucesso!`)
 }
 
-adicionarFilme( {id: 4, title:"Interestelar", genre:"Ficção Científica", year: 2014});
+adicionarFilme( {id: 9, title:"Interestelar", genre:"Ficção Científica", year: 2014});
+
+
+//Aula 03
+
+adicionarFilme( {id: 10, title:"Rambo", genre:"Ação", year:"1982"})
+
+const express = require('express'); // importa a biblioteca express
+const app = express(); //Cria uma aplicação com Express
+app.use(express.json()); //Permite trabalhar com objetos JSON {propriedade : valor}
+
+
+app.get('/read', (req, res) => {
+
+    let html = `
+        <html lang="pt-br">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Document</title>
+
+                        <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: rgb(174, 204, 194);
+        }
+        
+        ul {
+            margin-bottom: 15px;
+            padding: 15px;
+            list-style: none;
+            border-radius: 10px;
+            background-color: rgb(209, 111, 111);
+        }
+        
+                </style>
+                
+            </head>
+        <body>
+            <h1>Filmes Cadastrados</h1>
+            <ul>
+                `
+            
+            //Fazer a Listagem
+            
+            movies.forEach( (movie) => {
+                html+= `<li>Título: ${movie.title}, Gênero: ${movie.genre}, Ano: ${movie.year} </li>`
+            })
+
+
+            html +=` 
+                    </ul>
+            </body>
+            </html>`
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.end(html);
+})
+
+//Iniciando o servidor
+app.listen(3000, () => {console.log("Servidor rodando na porta 3000")})
