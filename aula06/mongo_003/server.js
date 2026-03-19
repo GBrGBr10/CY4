@@ -1,100 +1,122 @@
-//Boa prática 1 Requisitar as bibliotecas
-const express = require("express") ;
+//Primeira Boa prática = requisitar as bíbliotecas
+const express = require("express");
 const connectDB = require("./config/config");
+const Book = require("./models/book");
+const Emprestimo = require("./models/emprestimo")
+const validateTitle = require("./middlewares/validadeTitle")
+const validateAuthor = require("./middlewares/validadeAuthor")
+const validateYear = require("./middlewares/validadeYear")
 
-//Boa prática 2
-connectDB();
-
-//Boa prática 3 - criar servidor
+//Segunda Boa prática = criar o servidor
 const app = express();
 app.use(express.json());
-/*
-app.get("/divide", (req, res) => {
-    
+
+//Terceira Boa prática = criar as rotas
+app.post('/api/books', validateTitle, validateAuthor, validateYear, async (req, res) => {
     try {
-        const numerador = 10;
-        const denominador = 5;
+        /*
+        const title = req.body.title;
+        const author = req.body.author
+        const year = req.body.year
+        const genre = req.body.genre
+        */
+        const {title, author, year, genre} = req.body
+        
+        const newBook = new Book( {title, author, year, genre} );
+        await newBook.save();
+        res.status(201).json(newBook);
 
-        if (denominador === 0) {
-            res.status(400).json({error: "Não é possível dividir por zero!"});
-            return;
+    } catch(err) {
+
+        if(err.name ==="ValidationError") {
+            return res.status(400).json( {error1: err.errors.title?.message, error2: err.errors.author?.message, error3: err.errors.year?.message})
         }
-    const resultado = numerador / denominador;
-    res.json({resultado});
+        //res.status(500).json({error: 'Erro ao criar o livro!'})}
 
-    
-    } catch (err) {
-        res.status(500).json({error: 'Erro no servidor'})
-    };
+        res.status(500).json({error: err.name});
+    }
+ }) 
+
+app.get('/api/books', async (req, res) => {
+    try {
+        const books = await Book.find()
+        res.status(201).json(books);
+
+    } catch(err) {res.status(500).json({error: 'Erro ao buscar o livro!'})}
 } )
-*/
-
-app.get("/divide", (req, res) => {
-    
+//Ex 001: Criar uma rota de busca pelo Id de um livro
+app.get('/api/books/:id', async (req, res, next) => {
     try {
-        const numerador = 10;
-        const denominador = 5;
+        const {id} = req.params 
+        const bookById = await Book.findById(id)
+        res.status(201).json(bookById);
 
-        if (denominador === 0) {
-            throw new Error('Erro: Não é possível dividir por zero!')
+        if (!bookById) {
+            return res.status(404).json({ error: "Livro não encontrado"})
         }
-    const resultado = numerador / denominador;
-    res.json({resultado});
 
+    } catch(err) {
+        next(err)
+        //res.status(500).json({error: 'Erro ao buscar o livro pelo Id!'})}
     
-    } catch (err) {
-        res.status(500).json({error: err.message})
-    };
-} );
+} })
 
-app.get("/divide_html", (req, res) => {
-    
+app.patch('/api/books/:id', async (req, res) => {
     try {
-        const numerador = 10;
-        const denominador = 5;
+        const { id } = req.params; 
+        const updates = req.body;
+        const options = {new: true, runValidators: true} //Novo Objeto
 
-        if (denominador === 0) {
-            throw new Error('Erro: Não é possível dividir por zero!')
+        const updateBook = await Book.findByIdAndUpdate(id, updates, options)
+
+        res.status(201).json(updateBook);
+
+        if (!updateBook) {
+            return res.status(404).json({ error: "Livro não encontrado"})
         }
-    const resultado = numerador / denominador;
-    //res.json({resultado});
-    res.send(
-        /*html*/`
-        <!DOCTYPE html>
-            <html lang="pt-br">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Document</title>
-            <style>
 
-                h1{
-                    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-                    background-color: antiquewhite;
-                }
+    } catch(err) {res.status(500).json({error: 'Erro ao atualizar o livro!'})}
+} )
 
-                body{
-                    display: flex;
-                    justify-items: center;
-                    align-items: center;
-                }
+app.delete('/api/books/:id', async (req, res) => {
+    try {
+        const { id } = req.params; 
 
-            </style>
-        </head>
-        <body>
-            <div>
-                <h1>Resultado da Divisão</h1>
-                <div>${resultado}</div>
-            </div>
-        </body>
-            </html>
-            `
-    )
-    
-    } catch (err) {
-        res.status(500).json({error: err.message})
-    };
-} );
+        const deleteBook = await Book.findByIdAndDelete(id)
 
-//Boa prática 4 - Ligar numa porta
-app.listen(3000, () => console.log("Server running on port 3000"))
+        res.status(201).json(deleteBook);
+
+        if (!deleteBook) {
+            return res.status(404).json({ error: "Livro não encontrado"})
+        }
+
+        res.json( {message: "Livro excluido com sucesso!"})
+
+    } catch(err) {res.status(500).json({error: 'Erro ao excluir o livro!'})}
+} )
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json( {error: "Ocorreu um erro no servidor"} )
+})
+
+//Ex 002: Criar uma rota para guardar informações de emprestimos de livro: pessoa titulo data
+app.post('/api/emprestimo', async (req, res) => {
+    try {
+        const {title, pessoaDando, pessoaRecebendo} = req.body
+
+        const newEmprestimo = new Emprestimo( {title, pessoaDando, pessoaRecebendo} )
+        await newEmprestimo.save()
+        res.status(201).json(newEmprestimo);
+        
+    } catch(err) {res.status(500).json({error: 'Erro ao emprestar o livro!'})}
+})
+
+//Quarta Boa prática = conectar banco de dados
+connectDB();
+
+
+//Quinta Boa prática = ligar numa porta
+app.listen(3000, () => {
+    console.log("Server Running on port 3000");
+})
