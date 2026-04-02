@@ -1,0 +1,205 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Biblioteca Digital API",
+    "description": "Documentação da API da Biblioteca Digital"
+  },
+  "host": "localhost:3000",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "paths": {
+    "/books": {
+      "post": {
+
+        "summary": "Criar um novo livro",
+        "description": "Adicionar um novo livro a biblioteca digital",
+        "parameters": [
+          {
+            "name":"body",
+            "in":"body",
+            "description": "Dados do livro a ser criado",
+            "schema" : {
+              "type": "object",
+              "properties": {
+                "nome": {
+                  "type":"string",
+                  "example":"Senhor dos Anéis"
+                },
+                "author": {
+                  "type":"string",
+                  "example":"Tolkien"
+                },
+                "year": {
+                  "type": "integrer",
+                  "example": 1954
+                },
+                "genre": {
+                  "type":"string",
+                  "example": "fantasia"
+                  }
+                }
+              }
+            }
+        ],
+        "responses": {
+          "201": {
+            "description" : "Livro criado com sucesso"
+
+          },
+          "500" : {
+            "description": "Erro ao criar livro"
+          }
+        }
+      },
+      "get": {
+        "summary":"Lista os livros",
+        "description": "Obtém uma lista de todos os livros",
+        "parameters": [
+            {
+              "name": "title",
+              "in": "query",
+              "description": "Filtrar por título do livro",
+              "required": false,
+              "type": "string"
+            },
+            {
+              "name": "author",
+              "in": "query",
+              "description": "Filtrar por autor do livro",
+              "required": false,
+              "type": "string"
+            },
+            {
+           "name": "pageNumber",
+           "in": "query",
+           "description": "Número da página a ser retornada",
+           "required": false,
+           "type": "integer"
+            },
+            {
+           "name": "pageSize",
+           "in": "query",
+           "description": "Quantidade de resultados por página",
+           "required": false,
+           "type": "integer"
+            },
+            {
+              "name": "sortBy",
+              "in": "query",
+              "description": "Campo pelo qual os resultados serão ordenados (ex: title, year, author)",
+              "required": false,
+              "type": "string"
+              },
+              {
+              "name": "order",
+              "in": "query",
+              "description": "Ordem de classificação: 'asc' para crescente, 'desc' para decrescente",
+              "required": false,
+              "type": "string",
+              "enum": ["asc", "desc"]
+                }
+          ], 
+        "responses": {
+          "201": {
+            "description": "Livros listados com sucesso",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string", "example": "xxxxxxxxxxxxxxxxx"},
+                  "title": {"type": "string", "example":"Senhor dos Anéis"},
+                  "author": {"type": "string", "example":"Tolkien"},
+                  "year": {"type": "integer", "example": 1954},
+                  "genre": {"type": "string", "example": "Fantasia"}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/books/{id}": {
+      "patch": {
+        "summary": "Atualizar um livro",
+        "description": "Atualiza alguma propriedade do livro",
+        "parameters": [ 
+        {
+          "name": "id",
+          "in": "path",
+          "description": "Id do livro a ser atualizado",
+          "require": true,
+          "type": "string"
+        },
+        {
+          "name": "body",
+          "in": "body",
+          "description": "Dados do livro a ser atualizado",
+          "required": true,
+          "schema": {
+            "type": "object",
+              "properties": {
+                "title": {"type": "string", "example":"Senhor dos Anéis"},
+                "author": {"type": "string", "example":"Tolkien"},
+                "year": {"type": "integer", "example": 1954},
+                "genre": {"type": "string", "example": "Fantasia"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+          "description": "Livro atualizado com sucesso",
+          "schema": {
+              "type": "object",
+                "properties": {
+                  "title": {"type": "string", "example":"Senhor dos Anéis"},
+                  "author": {"type": "string", "example":"Tolkien"},
+                  "year": {"type": "integer", "example": 1954},
+                  "genre": {"type": "string", "example": "Fantasia"}
+                }
+            }
+          },
+          "404": {
+            "description": "Livro não encontrado"
+          },
+          "500":{
+            "description":"Erro interno do servidor"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletar um livro",
+        "description": "Deleta alguma propriedade do livro",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id do livro a ser deletado",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Livro excluído com sucesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string", "example": "Livro excluído com sucesso"}
+              }
+            }
+          },
+          "404": {
+            "description": "Livro não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }  
+    }
+  }
+}
+
