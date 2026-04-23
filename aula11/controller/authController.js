@@ -30,7 +30,7 @@ const login = (req, res) => {
     const access = jwt.sign(
         {email: user.email, role: user.role},
         "secreta",
-        {expiresIn:"5m"}
+        {expiresIn:"1m"}
     )
 
     const refresh = jwt.sign(
@@ -67,7 +67,7 @@ const refresh = (req, res) => {
 
 
         const newAccessToken = jwt.sign({ email: decoded.email, role:decoded.role }, "secreta", {
-            expiresIn: "5m",
+            expiresIn: "1m",
         });
 
 
